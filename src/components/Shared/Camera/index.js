@@ -16,7 +16,10 @@ import Measure from 'react-measure';
 import useUserMedia from '../../../hooks/camera/use-user-media';
 import useCardRatio from '../../../hooks/camera/use-card-ratio';
 import useOffsets from '../../../hooks/camera/use-offsets';
-import { Col, Row, Button } from 'antd';
+import { Col, Row, Button, Typography, Card } from 'antd';
+import b64toBlob from '../../../utils/b64ToFile/b64toBlob';
+
+const { Title } = Typography;
 
 const CAPTURE_OPTIONS = {
 	audio: false,
@@ -94,9 +97,66 @@ const Camera = ({ onCapture }) => {
     setIsFlashing(false)
     onClear()
   } */
+	let fileElem = null;
+
+	const onChangeUpload = ({ target }) => {
+		const [fileItemIn] = target.files;
+
+		if (fileItemIn) {
+			const reader = new FileReader();
+			reader.onloadend = (e) => {
+				const fileBase64 = e.target.result;
+				const block = fileBase64.split(';');
+				const contentType = block[0].split(':')[1];
+				const realData = block[1].split(',')[1];
+				const img = b64toBlob(realData, contentType);
+				onCapture({
+					image: URL.createObjectURL(img),
+					base64: {
+						file: fileBase64,
+						fileName: fileItemIn.name,
+					},
+				});
+			};
+			reader.readAsDataURL(fileItemIn);
+		}
+	};
+
+	const activateListeners = () => {
+		fileElem = document.getElementById('fileElem');
+		fileElem.addEventListener('change', onChangeUpload, false);
+		fileElem.click();
+	};
+
+	const takePhoto = () => {
+		if (fileElem) {
+			fileElem.click();
+		} else {
+			activateListeners();
+		}
+	};
 
 	if (!mediaStream) {
-		return null;
+		return (
+			<Card className="inner-card">
+				<Row>
+					<Col className="text-align center" span={24}>
+						<input
+							accept="image/*"
+							type="file"
+							id="fileElem"
+							style={{ display: 'none' }}
+							capture
+						/>
+						<Button type="link" onClick={takePhoto} className="big-button">
+							<Title level={4} className="text-primary m-0 p-0">
+								Capturar
+							</Title>
+						</Button>
+					</Col>
+				</Row>
+			</Card>
+		);
 	}
 
 	return (
@@ -131,6 +191,7 @@ const Camera = ({ onCapture }) => {
 								<div className="camera__overlay" hidden={!isVideoPlaying} />
 
 								<canvas
+									style={{ marginTop: '100px' }}
 									className="camera__canvas"
 									ref={canvasRef}
 									width={container.width}
@@ -146,14 +207,22 @@ const Camera = ({ onCapture }) => {
 							</Col>
 						</Row>
 						{isVideoPlaying && (
-							<Row justify="end" className="mt-4">
+							<Row
+								justify="end"
+								className="mt-4"
+								style={{
+									position: 'sticky',
+								}}
+							>
 								<Col>
 									<Button
 										type="primary"
 										onClick={handleCapture}
 										className="big-button"
 									>
-										Capturar
+										<Title level={4} className="text-primary m-0 p-0">
+											Capturar
+										</Title>
 									</Button>
 								</Col>
 							</Row>

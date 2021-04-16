@@ -9,24 +9,13 @@ const GetImageComp = () => {
 	const [preview, setPreview] = useState();
 	const [fileBase64, setFileBase64] = useState();
 	const [isOpen, setIsOpen] = useState(true);
-	const CameraExists =
-		'mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices;
+	/* const CameraExists =
+		'mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices; */
 
 	console.log('====================================');
+	console.log(preview);
 	console.log(fileBase64);
 	console.log('====================================');
-
-	if (!CameraExists) {
-		return (
-			<Card className="inner-card">
-				<Row>
-					<Col className="text-align center" span={24}>
-						<Title>No cuenta con cámara en su dispositivo</Title>
-					</Col>
-				</Row>
-			</Card>
-		);
-	}
 
 	return (
 		<>
