@@ -1,4 +1,5 @@
 import './styles/main.less';
+//import InputCapture from './pages/InputCapture';
 import GetImage from './pages/GetImage';
 
 function App() {
