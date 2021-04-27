@@ -101,7 +101,7 @@ const Camera = ({ onCapture }) => {
 	const captureImage = () => {
 		const upload = new UploadFile();
 		upload.loadfileToBase64({
-			accept: '.jpg, .png, .pdf',
+			accept: '.jpg, .png',
 			fnOnLoad: (imagen) => {
 				onCapture({
 					image: imagen.fileBase64,
@@ -110,6 +110,8 @@ const Camera = ({ onCapture }) => {
 			},
 			maxSize: 2000,
 			capture: true,
+			warningMsg:
+				'Peso máximo de 2Mb, por favor baje la resolución de su cámara.',
 		});
 	};
 
@@ -118,13 +120,6 @@ const Camera = ({ onCapture }) => {
 			<Card className="inner-card">
 				<Row>
 					<Col className="text-align center" span={24}>
-						<input
-							accept="image/*"
-							type="file"
-							id="fileElem"
-							style={{ display: 'none' }}
-							capture
-						/>
 						<Button type="link" onClick={captureImage} className="big-button">
 							<Title level={4} className="text-primary m-0 p-0">
 								Capturar
