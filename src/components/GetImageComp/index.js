@@ -12,8 +12,9 @@ const GetImageComp = () => {
 	/* const CameraExists =
 		'mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices; */
 
-	console.log('====================================');
+	console.log('====preview================================');
 	console.log(preview);
+	console.log('====fileBase64================================');
 	console.log(fileBase64);
 	console.log('====================================');
 

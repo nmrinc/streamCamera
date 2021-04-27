@@ -11,7 +11,7 @@ const useUserMedia = (requestedMedia) => {
 				);
 				setMediaStream(stream);
 			} catch (err) {
-				console.log('====================================');
+				console.log('====err================================');
 				console.log(err);
 				console.log('====================================');
 			}

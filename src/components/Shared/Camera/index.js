@@ -17,7 +17,7 @@ import useUserMedia from '../../../hooks/camera/use-user-media';
 import useCardRatio from '../../../hooks/camera/use-card-ratio';
 import useOffsets from '../../../hooks/camera/use-offsets';
 import { Col, Row, Button, Typography, Card } from 'antd';
-import b64toBlob from '../../../utils/b64ToFile/b64toBlob';
+import UploadFile from '../../../utils/UploadFile';
 
 const { Title } = Typography;
 
@@ -97,43 +97,20 @@ const Camera = ({ onCapture }) => {
     setIsFlashing(false)
     onClear()
   } */
-	let fileElem = null;
 
-	const onChangeUpload = ({ target }) => {
-		const [fileItemIn] = target.files;
-
-		if (fileItemIn) {
-			const reader = new FileReader();
-			reader.onloadend = (e) => {
-				const fileBase64 = e.target.result;
-				const block = fileBase64.split(';');
-				const contentType = block[0].split(':')[1];
-				const realData = block[1].split(',')[1];
-				const img = b64toBlob(realData, contentType);
+	const captureImage = () => {
+		const upload = new UploadFile();
+		upload.loadfileToBase64({
+			accept: '.jpg, .png, .pdf',
+			fnOnLoad: (imagen) => {
 				onCapture({
-					image: URL.createObjectURL(img),
-					base64: {
-						file: fileBase64,
-						fileName: fileItemIn.name,
-					},
+					image: imagen.fileBase64,
+					base64: imagen,
 				});
-			};
-			reader.readAsDataURL(fileItemIn);
-		}
-	};
-
-	const activateListeners = () => {
-		fileElem = document.getElementById('fileElem');
-		fileElem.addEventListener('change', onChangeUpload, false);
-		fileElem.click();
-	};
-
-	const takePhoto = () => {
-		if (fileElem) {
-			fileElem.click();
-		} else {
-			activateListeners();
-		}
+			},
+			maxSize: 2000,
+			capture: true,
+		});
 	};
 
 	if (!mediaStream) {
@@ -148,7 +125,7 @@ const Camera = ({ onCapture }) => {
 							style={{ display: 'none' }}
 							capture
 						/>
-						<Button type="link" onClick={takePhoto} className="big-button">
+						<Button type="link" onClick={captureImage} className="big-button">
 							<Title level={4} className="text-primary m-0 p-0">
 								Capturar
 							</Title>
