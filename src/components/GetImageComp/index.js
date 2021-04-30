@@ -6,14 +6,11 @@ import { Col, Row, Image, Card, Button, Typography } from 'antd';
 const { Title } = Typography;
 
 const GetImageComp = () => {
-	const [preview, setPreview] = useState();
-	const [fileBase64, setFileBase64] = useState();
+	const [fileBase64, setFileBase64] = useState(null);
 	const [isOpen, setIsOpen] = useState(true);
 	/* const CameraExists =
 		'mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices; */
 
-	console.log('====preview================================');
-	console.log(preview);
 	console.log('====fileBase64================================');
 	console.log(fileBase64);
 	console.log('====================================');
@@ -24,17 +21,15 @@ const GetImageComp = () => {
 				<Row>
 					<Col span={24}>
 						<Camera
-							onCapture={({ image, base64 }) => {
-								setPreview(image);
+							onCapture={({ base64 }) => {
 								setFileBase64(base64);
 								setIsOpen(!isOpen);
 							}}
-							onClear={() => setPreview(undefined)}
 						/>
 					</Col>
 				</Row>
 			)}
-			{preview && (
+			{fileBase64?.fileBase64 && (
 				<Card className="inner-card">
 					<Row justify="center" align="middle">
 						<Col className="mb-2">
@@ -42,7 +37,6 @@ const GetImageComp = () => {
 								type="link"
 								onClick={() => {
 									setIsOpen(!isOpen);
-									setPreview(null);
 									setFileBase64(null);
 								}}
 								className="big-button"
@@ -53,7 +47,10 @@ const GetImageComp = () => {
 							</Button>
 						</Col>
 						<Col span={24}>
-							<Image className="img-fluid img-rounded" src={preview} />
+							<Image
+								className="img-fluid img-rounded"
+								src={fileBase64?.fileBase64}
+							/>
 						</Col>
 					</Row>
 				</Card>

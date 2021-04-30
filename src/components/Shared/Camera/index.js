@@ -1,10 +1,15 @@
 /**
  * @concept COMPONENTE QUE UTILIZA LA CÁMARA DEL DISPOSITIVO
+ * @context Revisa si existe un dispositivo y tiene acceso para detonar la captura.
+ * @context De igual manera si el usuario utiliza móvil o desktop
+ * ----------------------------------------------------------------
  * @o Utiliza los hooks :
  * useUserMedia
  * useCardRatio
  * useOffsets
- * @o También la librería react-measure
+ * @o También las librerías:
+ * react-measure
+ *
  * ----------------------------------------------------------------
  * @data Retorna:
  * @fields image: Una imagen blob para pintar la previsualización
@@ -12,7 +17,9 @@
  */
 
 import React, { useState, useRef } from 'react';
+import { isMobile } from 'react-device-detect';
 import Measure from 'react-measure';
+import moment from 'moment';
 import useUserMedia from '../../../hooks/camera/use-user-media';
 import useCardRatio from '../../../hooks/camera/use-card-ratio';
 import useOffsets from '../../../hooks/camera/use-offsets';
@@ -24,6 +31,7 @@ const { Title } = Typography;
 const CAPTURE_OPTIONS = {
 	audio: false,
 	video: { facingMode: 'environment' },
+	isMobile,
 };
 
 const Camera = ({ onCapture }) => {
@@ -34,7 +42,7 @@ const Camera = ({ onCapture }) => {
 	const [isVideoPlaying, setIsVideoPlaying] = useState(false);
 	const [isFlashing, setIsFlashing] = useState(false);
 
-	const mediaStream = useUserMedia(CAPTURE_OPTIONS);
+	let mediaStream = useUserMedia(CAPTURE_OPTIONS);
 	const [aspectRatio, calculateRatio] = useCardRatio(1.586);
 	const offsets = useOffsets(
 		videoRef.current && videoRef.current.videoWidth,
@@ -75,19 +83,26 @@ const Camera = ({ onCapture }) => {
 			container.height
 		);
 
-		canvasRef.current.toBlob(
-			(blob) => {
-				const reader = new FileReader();
-				let base64data = null;
-				reader.readAsDataURL(blob);
-				reader.onloadend = () => {
-					base64data = reader.result;
-					onCapture({ image: URL.createObjectURL(blob), base64: base64data });
-				};
-			},
-			'image/jpeg',
-			1
-		);
+		canvasRef.current.toBlob((blob) => {
+			const reader = new FileReader();
+			let base64data = null;
+			reader.readAsDataURL(blob);
+			reader.onloadend = () => {
+				base64data = reader.result;
+				const block = base64data.split(';');
+				const type = block[0].split(':')[1];
+				onCapture({
+					base64: {
+						fileBase64: base64data,
+						name: `${moment().format('YYYY_MM_DDTHH_mm')}.${
+							type.split('/')[1]
+						}`,
+						size: '',
+						type,
+					},
+				});
+			};
+		}, 'image/jpeg');
 		setIsFlashing(true);
 	};
 
@@ -101,7 +116,7 @@ const Camera = ({ onCapture }) => {
 	const captureImage = () => {
 		const upload = new UploadFile();
 		upload.loadfileToBase64({
-			accept: '.jpg, .png',
+			accept: 'image/*',
 			fnOnLoad: (imagen) => {
 				onCapture({
 					image: imagen.fileBase64,
@@ -109,13 +124,13 @@ const Camera = ({ onCapture }) => {
 				});
 			},
 			maxSize: 2000,
-			capture: true,
+			capture: 'environment',
 			warningMsg:
-				'Peso máximo de 2Mb, por favor baje la resolución de su cámara.',
+				'Peso máximo de 2Mb, por favor reduzca la resolución de su cámara.',
 		});
 	};
 
-	if (!mediaStream) {
+	if (isMobile || !mediaStream) {
 		return (
 			<Card className="inner-card">
 				<Row>

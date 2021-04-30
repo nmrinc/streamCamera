@@ -47,6 +47,7 @@ class UploadFile {
 	 *  y resuelve una funcion con los valores de la carga
 	 * @returns  '{name, type, size, fileBase64}
 	 *  @o El parámetro capture sirve para obtener la imagen con la cámara del móvil.
+	 * 	Se puede utilizar "environment" para cámara trasera o "user" para cámara frontal
 	 *  Es opcional y por default es false
 	 */
 	loadfileToBase64 = ({

@@ -6,10 +6,14 @@ const useUserMedia = (requestedMedia) => {
 	useEffect(() => {
 		async function enableVideoStream() {
 			try {
-				const stream = await navigator.mediaDevices.getUserMedia(
-					requestedMedia
-				);
-				setMediaStream(stream);
+				if (!requestedMedia.isMobile) {
+					const stream = await navigator.mediaDevices.getUserMedia(
+						requestedMedia
+					);
+					setMediaStream(stream);
+				} else {
+					setMediaStream('');
+				}
 			} catch (err) {
 				console.log('====err================================');
 				console.log(err);
